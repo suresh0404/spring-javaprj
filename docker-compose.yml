@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:9.2
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_USER=sradmin
+      - MYSQL_PASSWORD=sradmin
+      - MYSQL_DATABASE=sradmin
+    volumes:
+      - "./conf.d:/etc/mysql/conf.d:ro"
+  postgres:
+    image: postgres:17.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=sradmin
+      - POSTGRES_USER=sradmin
+      - POSTGRES_DB=sradmin
