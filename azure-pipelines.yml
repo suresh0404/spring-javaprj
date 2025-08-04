@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  vmImage: az-jenkins-agent
+  vmImage: Default
 
 steps:
 - task: Maven@3
