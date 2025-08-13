@@ -1,32 +1,42 @@
 pipeline {
     agent any
+
     tools {
         maven 'Maven3'
     }
+
+    environment {
+        DOCKERHUB_USER = credentials('dockerhub-user')
+        DOCKERHUB_PASS = credentials('dockerhub-pass')
+    }
+
     stages {
-        stage('Clone') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/<username>/<repo>.git'
+                git branch: 'main',
+                    url: 'https://github.com/suresh0404/spring-javaprj.git'
             }
         }
-        stage('Build') {
+        stage('Build with Maven') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -DskipTests'
             }
         }
-        stage('Docker Build & Push') {
+        stage('Build Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: 'dockerhub-cred', url: '']) {
-                    sh 'docker build -t <dockerhub-username>/<image-name>:latest .'
-                    sh 'docker push <dockerhub-username>/<image-name>:latest'
-                }
+                sh 'docker build -t $DOCKERHUB_USER/devops-mini-project:latest .'
             }
         }
-        stage('Deploy') {
+        stage('Push to DockerHub') {
             steps {
-                sh 'docker pull <dockerhub-username>/<image-name>:latest'
-                sh 'docker stop myapp || true && docker rm myapp || true'
-                sh 'docker run -d --name myapp -p 5000:5000 <dockerhub-username>/<image-name>:latest'
+                sh 'echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin'
+                sh 'docker push $DOCKERHUB_USER/devops-mini-project:latest'
+            }
+        }
+        stage('Deploy on EC2') {
+            steps {
+                sh 'docker rm -f devops-app || true'
+                sh 'docker run -d --name devops-app -p 8080:8080 $DOCKERHUB_USER/devops-mini-project:latest'
             }
         }
     }
