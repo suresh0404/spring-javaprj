@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'
+        maven 'Maven3' // Make sure Maven3 is installed in Jenkins Global Tools
     }
-
+    
     environment {
-        DOCKERHUB_USER = credentials('dockerhub-user')
-        DOCKERHUB_PASS = credentials('dockerhub-pass')
+        DOCKERHUB = credentials('dockerhub-creds') // Username+Password in Jenkins
     }
 
     stages {
@@ -17,26 +16,30 @@ pipeline {
                     url: 'https://github.com/suresh0404/spring-javaprj.git'
             }
         }
+
         stage('Build with Maven') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
         }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKERHUB_USER/devops-mini-project:latest .'
+                sh 'docker build -t $DOCKERHUB_USR/devops-mini-project:latest .'
             }
         }
+
         stage('Push to DockerHub') {
             steps {
-                sh 'echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin'
-                sh 'docker push $DOCKERHUB_USER/devops-mini-project:latest'
+                sh 'echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin'
+                sh 'docker push $DOCKERHUB_USR/devops-mini-project:latest'
             }
         }
+
         stage('Deploy on EC2') {
             steps {
                 sh 'docker rm -f devops-app || true'
-                sh 'docker run -d --name devops-app -p 8080:8080 $DOCKERHUB_USER/devops-mini-project:latest'
+                sh 'docker run -d --name devops-app -p 8080:8080 $DOCKERHUB_USR/devops-mini-project:latest'
             }
         }
     }
