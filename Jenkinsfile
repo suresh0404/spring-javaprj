@@ -39,7 +39,7 @@ pipeline {
         stage('Deploy on EC2') {
             steps {
                 sh 'docker rm -f devops-app || true'
-                sh 'docker run -d --name devops-app -p 8080:8080 $DOCKERHUB_USR/devops-mini-project:latest'
+                sh sh 'docker run -d --name devops-app -p 9090:8080 $DOCKERHUB_USR/devops-mini-project:latest'
             }
         }
     }
