@@ -6,7 +6,7 @@ pipeline {
     }
     
     environment {
-        DOCKERHUB = credentials('dockerhub-creds') // Username+Password in Jenkins
+        DOCKERHUB = credentials('dockerhub-creds') // Username+Password in Jenkins.
     }
 
     stages {
