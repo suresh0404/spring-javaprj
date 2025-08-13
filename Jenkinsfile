@@ -36,7 +36,7 @@ pipeline {
             }
         }
 
-        stage('Deploy on EC2') {
+        stage('Deploy on Azure') {
             steps {
                 sh 'docker rm -f devops-app || true'
                 sh 'docker run -d --name devops-app -p 9090:9090 $DOCKERHUB_USR/devops-mini-project:latest'
